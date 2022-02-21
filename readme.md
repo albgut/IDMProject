@@ -1,4 +1,4 @@
-# projet IDM
+# Projet IDM
  
 
 ## Installation
