@@ -1,20 +1,9 @@
 package org.xtext.idmProject.generator;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.lang.ProcessBuilder.Redirect;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Stack;
 import java.util.function.Function;
@@ -24,12 +13,9 @@ import org.xtext.idmProject.iDMProject.Final;
 import org.xtext.idmProject.iDMProject.Insert;
 import org.xtext.idmProject.iDMProject.JsonCommand;
 import org.xtext.idmProject.iDMProject.JsonCommands;
-import org.xtext.idmProject.iDMProject.JsonObject;
-import org.xtext.idmProject.iDMProject.Modify;
 import org.xtext.idmProject.iDMProject.Mult;
 import org.xtext.idmProject.iDMProject.Operation;
 import org.xtext.idmProject.iDMProject.Path;
-import org.xtext.idmProject.iDMProject.Print;
 import org.xtext.idmProject.iDMProject.Remove;
 import org.xtext.idmProject.iDMProject.Select;
 import org.xtext.idmProject.iDMProject.Store;
@@ -43,22 +29,14 @@ import org.xtext.idmProject.iDMProject.impl.SelectImpl;
 import org.xtext.idmProject.iDMProject.impl.StoreImpl;
 import org.xtext.idmProject.iDMProject.impl.SumImpl;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.core.JsonParser.NumberType;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 
 public class JacksonCompiler {
 	
@@ -259,6 +237,14 @@ public class JacksonCompiler {
 		Stack<String> stackPath = pathFromCurrentToStack(storeAction.getPath());
 		JsonNode newJson = changeJsonWithPath(currentJsonObject, stackPath);
 		//TODO check Jackson store in file system a json.
+		try {
+		    ObjectMapper mapper = new ObjectMapper();
+		    ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
+		    writer.writeValue(Paths.get(((Store)storeAction).getFilePath()).toFile(), newJson);
+
+		} catch (Exception ex) {
+		    ex.printStackTrace();
+		}
 		return "STORE";
 	}
 	

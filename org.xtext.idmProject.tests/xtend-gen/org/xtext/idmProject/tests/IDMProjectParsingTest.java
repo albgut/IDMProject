@@ -159,4 +159,16 @@ public class IDMProjectParsingTest {
       throw Exceptions.sneakyThrow(_e);
     }
   }
+  
+  @Test
+  public void ex8Test() {
+    try {
+      String prog = this.parser("./progs/ex8.IDMProject");
+      final JsonCommands result = this.parseHelper.parse(prog);
+      JacksonCompiler compiler = new JacksonCompiler(result);
+      compiler.compileAndRun();
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
+  }
 }

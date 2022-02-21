@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><testrun name="IDMProjectParsingTest" project="org.xtext.idmProject.tests" tests="9" started="9" failures="0" errors="0" ignored="0">
+  <testsuite name="org.xtext.idmProject.tests.IDMProjectParsingTest" time="1.982" displayname="IDMProjectParsingTest" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]">
+    <testcase name="ex1Test" classname="org.xtext.idmProject.tests.IDMProjectParsingTest" time="0.847" displayname="ex1Test()" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]/[method:ex1Test()]"/>
+    <testcase name="ex2Test" classname="org.xtext.idmProject.tests.IDMProjectParsingTest" time="0.199" displayname="ex2Test()" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]/[method:ex2Test()]"/>
+    <testcase name="ex3Test" classname="org.xtext.idmProject.tests.IDMProjectParsingTest" time="0.183" displayname="ex3Test()" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]/[method:ex3Test()]"/>
+    <testcase name="ex4Test" classname="org.xtext.idmProject.tests.IDMProjectParsingTest" time="0.159" displayname="ex4Test()" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]/[method:ex4Test()]"/>
+    <testcase name="ex5Test" classname="org.xtext.idmProject.tests.IDMProjectParsingTest" time="0.175" displayname="ex5Test()" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]/[method:ex5Test()]"/>
+    <testcase name="ex6Test" classname="org.xtext.idmProject.tests.IDMProjectParsingTest" time="0.166" displayname="ex6Test()" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]/[method:ex6Test()]"/>
+    <testcase name="ex7Test" classname="org.xtext.idmProject.tests.IDMProjectParsingTest" time="0.161" displayname="ex7Test()" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]/[method:ex7Test()]"/>
+    <testcase name="ex8Test" classname="org.xtext.idmProject.tests.IDMProjectParsingTest" time="0.073" displayname="ex8Test()" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]/[method:ex8Test()]"/>
+    <testcase name="loadModel" classname="org.xtext.idmProject.tests.IDMProjectParsingTest" time="0.019" displayname="loadModel()" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]/[method:loadModel()]"/>
+  </testsuite>
+</testrun>

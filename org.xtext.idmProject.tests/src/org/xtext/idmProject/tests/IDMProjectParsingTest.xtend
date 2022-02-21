@@ -109,4 +109,12 @@ class IDMProjectParsingTest {
 		var JacksonCompiler compiler = new JacksonCompiler(result)
 		compiler.compileAndRun()
 	}
+	
+	@Test
+	def void ex8Test(){
+		var String prog = parser("./progs/ex8.IDMProject")
+		val result = parseHelper.parse(prog)
+		var JacksonCompiler compiler = new JacksonCompiler(result)
+		compiler.compileAndRun()
+	}
 }

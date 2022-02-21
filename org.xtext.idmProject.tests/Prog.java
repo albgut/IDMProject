@@ -21,8 +21,7 @@ public class Prog{
 public static void main(String[] args) throws Exception{
 ObjectMapper objectMapper = new ObjectMapper();
 objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
-String jsonFilePath = "data/jsonTestDouble.json";
+String jsonFilePath = "data/jsonTest.json";
 JsonNode currentJsonObject = objectMapper.readTree(Paths.get(jsonFilePath).toFile());
-SUMSystem.out.println("");
-}
+STORE}
 }
