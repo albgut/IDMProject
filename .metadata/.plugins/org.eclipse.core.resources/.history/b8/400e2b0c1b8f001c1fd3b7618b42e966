@@ -1,0 +1,3 @@
+load "data/jsonTestDouble.json"
+add a b
+print

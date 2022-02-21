@@ -1,0 +1,2 @@
+load "data/jsonTest.json"
+print

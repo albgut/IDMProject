@@ -1,0 +1,3 @@
+load "data/jsonTest.json"
+mult a b
+print

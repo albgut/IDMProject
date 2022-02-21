@@ -1,0 +1,337 @@
+package org.xtext.idmProject.generator;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.lang.ProcessBuilder.Redirect;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Stack;
+import java.util.function.Function;
+import javax.tools.*;
+
+import org.xtext.idmProject.iDMProject.Final;
+import org.xtext.idmProject.iDMProject.Insert;
+import org.xtext.idmProject.iDMProject.JsonCommand;
+import org.xtext.idmProject.iDMProject.JsonCommands;
+import org.xtext.idmProject.iDMProject.JsonObject;
+import org.xtext.idmProject.iDMProject.Modify;
+import org.xtext.idmProject.iDMProject.Mult;
+import org.xtext.idmProject.iDMProject.Operation;
+import org.xtext.idmProject.iDMProject.Path;
+import org.xtext.idmProject.iDMProject.Print;
+import org.xtext.idmProject.iDMProject.Remove;
+import org.xtext.idmProject.iDMProject.Select;
+import org.xtext.idmProject.iDMProject.Store;
+import org.xtext.idmProject.iDMProject.Sum;
+import org.xtext.idmProject.iDMProject.impl.InsertImpl;
+import org.xtext.idmProject.iDMProject.impl.ModifyImpl;
+import org.xtext.idmProject.iDMProject.impl.MultImpl;
+import org.xtext.idmProject.iDMProject.impl.PrintImpl;
+import org.xtext.idmProject.iDMProject.impl.RemoveImpl;
+import org.xtext.idmProject.iDMProject.impl.SelectImpl;
+import org.xtext.idmProject.iDMProject.impl.StoreImpl;
+import org.xtext.idmProject.iDMProject.impl.SumImpl;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.core.JsonParser.NumberType;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
+
+public class JacksonCompiler {
+	
+	private JsonCommands jsonCommands;
+	private Stack<String> currentPath;
+	private JsonNode currentJsonObject;
+	
+	private enum Binop {
+		MULT, ADD
+	}
+		
+	private final Map<Class<?>, Function<Operation, String>> MAP_OPERATION_TO_FUNCTION = Map.of(
+			InsertImpl.class, this::insertAction,
+			ModifyImpl.class, this::modifyAction,
+			SumImpl.class, this::sumAction,
+			RemoveImpl.class, this::removeAction,
+			MultImpl.class, this::multAction,
+			SelectImpl.class, this::selectAction
+			);
+	
+	private final Map<Class<?>, Function<Final, String>> MAP_FINAL_TO_FUNCTION = Map.of(
+			PrintImpl.class, this::printAction,
+			StoreImpl.class, this::storeAction
+			);
+
+	public JacksonCompiler(JsonCommands jsonCommands) {
+		super();
+		this.jsonCommands = jsonCommands;
+	}
+	
+	private Stack<String> pathFromCurrentToStack(Path path) {
+		try {
+			path.getValues();
+		} catch (NullPointerException e) {
+			return new Stack<String>();
+		}
+		Stack<String> stackPath = new Stack<>();
+		stackPath.addAll(currentPath);
+		path.getValues().forEach(stringValue -> changeOneStepPath(stackPath, stringValue));
+		return stackPath;
+	}
+
+	private void changeOneStepPath(Stack<String> pathToChange, String step) {
+		switch (step) {
+		case "$":
+			pathToChange.clear();
+			break;
+		case "?":
+			pathToChange.pop();
+			break;
+		default:
+			pathToChange.push(step);
+			break;
+		}
+	}
+	
+	private Stack<String> reverseStack(Stack<String> stack){
+		Stack<String> newStack = new Stack<String>();
+		if (stack.isEmpty()) {
+			return newStack;
+		}
+		else {
+			newStack.push(stack.pop());
+			newStack.addAll(reverseStack(stack));
+			return newStack;
+		}
+	}
+	
+	private JsonNode changeJsonWithPath(JsonNode json, Stack<String> stack){
+		JsonNode newJson = json.deepCopy();
+		Stack<String> newStack = (Stack<String>) stack.clone();
+		newStack = reverseStack(newStack);
+		while(!newStack.isEmpty()) {
+			newJson = newJson.path(newStack.pop());
+		}
+		return newJson;
+	}
+
+	@SuppressWarnings("deprecation")
+	private String insertAction(Operation insertObject) {
+		Stack<String> stackPath = pathFromCurrentToStack(((Insert)insertObject).getPath());
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			JsonNode jsonToInsert = mapper.readTree(((Insert)insertObject).getJsonInString());
+			ObjectNode newJson = currentJsonObject.deepCopy();
+			String lastKey = stackPath.pop();
+			stackPath = reverseStack(stackPath);
+			ObjectNode parentObjectNode;
+			if (stackPath.isEmpty()) {
+				parentObjectNode = newJson;
+			}
+			else {
+				String path = "/" + String.join("/", stackPath);
+				JsonPointer valueNodePointer = JsonPointer.compile(path);
+				JsonNode parentJsonNode = newJson.at(valueNodePointer);
+				parentObjectNode = (ObjectNode) parentJsonNode;
+			}
+		    
+		    parentObjectNode.put(lastKey, jsonToInsert);
+		    
+		    currentJsonObject = newJson;
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return "INSERT";
+	}
+	
+	//TODO we can remove and merge insert with modify
+	private String modifyAction(Operation modifyObject) {
+		return "MODIFY";
+	}
+	
+	private void binaryAction(Path pathToStore, Path pathSecondPart, Binop binop) {
+		Stack<String> stackPathToStore = pathFromCurrentToStack(pathSecondPart);
+		JsonNode newJsonToMult = changeJsonWithPath(currentJsonObject, stackPathToStore);
+		Double toPerform = 0.0;
+		try {
+			toPerform = newJsonToMult.asDouble();
+		} catch (Exception e) {
+			//TODO manage if it is not a double or int.
+			e.printStackTrace();
+		}
+		Stack<String> stackPath = pathFromCurrentToStack(pathToStore);
+		ObjectNode newJson = currentJsonObject.deepCopy();
+		String lastKey = stackPath.pop();
+		stackPath = reverseStack(stackPath);
+		ObjectNode parentObjectNode;
+		if (stackPath.isEmpty()) {
+			parentObjectNode = newJson;
+		}
+		else {
+			String path = "/" + String.join("/", stackPath);
+			JsonPointer valueNodePointer = JsonPointer.compile(path);
+			JsonNode parentJsonNode = newJson.at(valueNodePointer);
+			parentObjectNode = (ObjectNode) parentJsonNode;
+		}
+		switch (binop) {
+		case ADD:
+			parentObjectNode.put(lastKey, toPerform + parentObjectNode.path(lastKey).asDouble());
+			break;
+			
+		case MULT:
+			parentObjectNode.put(lastKey, toPerform * parentObjectNode.path(lastKey).asDouble());
+			break;
+
+		default:
+			break;
+		}
+		
+		currentJsonObject = newJson;
+	}
+	
+	private String sumAction(Operation sumObject) {
+		binaryAction(((Sum)sumObject).getPathTOStore(), ((Sum)sumObject).getPathToAdd(), Binop.ADD);
+		return "SUM";
+	}
+	
+	private String removeAction(Operation removeObject){
+		Stack<String> stackPath = pathFromCurrentToStack(((Remove)removeObject).getPath());
+		ObjectNode newJson = currentJsonObject.deepCopy();
+		String lastKey = stackPath.pop();
+		stackPath = reverseStack(stackPath);
+		ObjectNode parentObjectNode;
+		if (stackPath.isEmpty()) {
+			parentObjectNode = newJson;
+		}
+		else {
+			String path = "/" + String.join("/", stackPath);
+			JsonPointer valueNodePointer = JsonPointer.compile(path);
+			JsonNode parentJsonNode = newJson.at(valueNodePointer);
+			parentObjectNode = (ObjectNode) parentJsonNode;
+		}
+		
+		parentObjectNode.remove(lastKey);
+		
+		currentJsonObject = newJson;
+		return "REMOVE";
+	}
+	
+	private String multAction(Operation multObject){
+		binaryAction(((Mult)multObject).getPathTOStore(), ((Mult)multObject).getPathToMult(), Binop.MULT);
+		return "MULT";
+	}
+	
+	private String selectAction(Operation selectAction) {
+		((Select)selectAction).getPath().getValues().forEach(s -> changeOneStepPath(this.currentPath, s));
+		return "SELECT";
+	}
+	
+	private String printAction(Final printAction) {
+		Stack<String> stackPath = pathFromCurrentToStack(printAction.getPath());
+		JsonNode newJson = changeJsonWithPath(currentJsonObject, stackPath);
+		System.out.println(newJson.toPrettyString());
+		return "PRINT";
+	}
+	
+	private String storeAction(Final storeAction) {
+		Stack<String> stackPath = pathFromCurrentToStack(storeAction.getPath());
+		JsonNode newJson = changeJsonWithPath(currentJsonObject, stackPath);
+		//TODO check Jackson store in file system a json.
+		return "STORE";
+	}
+	
+	public void compileAndRun() throws IOException{
+		String jsonFilePath;
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+		for(JsonCommand jsonCommand : jsonCommands.getJsonCommands()) {
+			jsonFilePath = jsonCommand.getInit().getFilePath();
+			currentJsonObject = objectMapper.readTree(Paths.get(jsonFilePath).toFile());
+			currentPath = new Stack<>();
+			for(Operation jsonOperation : jsonCommand.getOperations()) {
+				MAP_OPERATION_TO_FUNCTION.getOrDefault(jsonOperation.getClass(), x -> "").apply(jsonOperation);
+			}
+			Final finalOperation = jsonCommand.getFinal();
+			MAP_FINAL_TO_FUNCTION.getOrDefault(finalOperation.getClass(), x -> "").apply(finalOperation);
+		}		
+	}
+	
+	public static void main(String[] args) throws Exception {
+		String test = "package org.xtext.idmProject.generator\n"
+				+ "public class Main{\n"
+				+ "public static void main(String[] args) {\n"
+				+ "System.out.println(\"Hello world\");\n"
+				+ "}\n"
+				+ "}\n";
+
+		
+		
+		String fileToCompile = "src" + java.io.File.separator + "org" + java.io.File.separator + "xtext" + java.io.File.separator + "idmProject" + java.io.File.separator + "generator" + java.io.File.separator + "Main.java";
+		String classToCompile =  "org" + java.io.File.separator + "xtext" + java.io.File.separator + "idmProject" + java.io.File.separator + "generator" + java.io.File.separator + "Main";
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		int compilationResult = compiler.run(null, null, null, fileToCompile);
+		try {
+			/*
+			Class<? extends Runnable> theClass = 
+				    Class.forName(fileToCompile).asSubclass(Runnable.class);
+				Runnable instance = theClass.newInstance();
+				new Thread(instance).start();
+				*/
+			Process p = Runtime.getRuntime().exec("javac " + fileToCompile);
+			p.waitFor();
+			p = Runtime.getRuntime().exec("java -classpath src /org/xtext/idmProject/generator/Main");
+			p.waitFor();
+			ProcessBuilder pb = new ProcessBuilder("pwd");
+			pb.redirectOutput(Redirect.INHERIT);
+			pb.redirectError(Redirect.INHERIT);
+			p = pb.start();
+			pb = new ProcessBuilder("java -classpath src " + classToCompile);
+			pb.redirectOutput(Redirect.INHERIT);
+			pb.redirectError(Redirect.INHERIT);
+			p = pb.start();
+			InputStream  in = p.getInputStream();
+			OutputStream out = p.getOutputStream(); 
+			OutputStreamWriter outw = new OutputStreamWriter(out);
+			InputStreamReader inr = new InputStreamReader(in);
+			outw.append('H');
+			BufferedReader br = new BufferedReader(inr);
+			StringBuilder sb = new StringBuilder();
+			String s;
+			while ((s = br.readLine()) != null) {
+			  sb.append(s).append("\n");
+			}
+			System.out.println(sb.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(compilationResult == 0) {
+			System.out.println("Successss");
+		}
+		else {
+			System.out.println("FFFailllll");
+		}
+	}
+
+}
+

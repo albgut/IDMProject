@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="iDMProject" nsURI="http://www.xtext.org/idmProject/IDMProject"
+    nsPrefix="iDMProject">
+  <eClassifiers xsi:type="ecore:EClass" name="JsonCommands">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="jsonCommands" upperBound="-1"
+        eType="#//JsonCommand" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="JsonCommand">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="init" eType="#//Initialisation"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="operations" upperBound="-1"
+        eType="#//Operation" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="final" eType="#//Final"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Initialisation">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="filePath" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Operation"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Insert" eSuperTypes="#//Operation">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="path" eType="#//Path" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="jsonInString" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Path">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="values" unique="false"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Modify" eSuperTypes="#//Operation">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="path" eType="#//Path" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="jsonObject" eType="#//JsonObject"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Sum" eSuperTypes="#//Operation">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pathTOStore" eType="#//Path"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pathToAdd" eType="#//Path"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Remove" eSuperTypes="#//Operation">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="path" eType="#//Path" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Mult" eSuperTypes="#//Operation">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pathTOStore" eType="#//Path"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pathToMult" eType="#//Path"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Select" eSuperTypes="#//Operation">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="path" eType="#//Path" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Final">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="path" eType="#//Path" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Store" eSuperTypes="#//Final">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="filePath" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Print" eSuperTypes="#//Final"/>
+  <eClassifiers xsi:type="ecore:EClass" name="JsonObject"/>
+  <eClassifiers xsi:type="ecore:EClass" name="JsonPrimitive" eSuperTypes="#//JsonObject"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ArrayObject" eSuperTypes="#//JsonPrimitive">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="values" upperBound="-1"
+        eType="#//JsonObject" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BooleanObject" eSuperTypes="#//JsonPrimitive">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="#//Boolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Boolean">
+    <eLiterals name="TRUE" literal="true"/>
+    <eLiterals name="FALSE" value="1" literal="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="StringObject" eSuperTypes="#//JsonPrimitive">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="JsonEntries" eSuperTypes="#//JsonObject">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="listEntries" upperBound="-1"
+        eType="#//JsonEntry" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="JsonEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="jsonObject" eType="#//JsonObject"
+        containment="true"/>
+  </eClassifiers>
+</ecore:EPackage>

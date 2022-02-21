@@ -1,0 +1,5 @@
+package org.xtext.idmProject.generator;
+
+public class Main {
+
+}

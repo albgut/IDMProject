@@ -1,0 +1,5 @@
+load "data/jsonTest.json"
+select fleur
+select ?
+remove a
+print $

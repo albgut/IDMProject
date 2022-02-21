@@ -1,0 +1,119 @@
+grammar org.xtext.idmProject.IDMProject with org.eclipse.xtext.common.Terminals
+
+generate iDMProject "http://www.xtext.org/idmProject/IDMProject"
+
+JsonCommands:
+	jsonCommands+=JsonCommand*
+;
+
+JsonCommand:
+	init=Initialisation
+	(operations+=Operation)*
+	final=Final
+;
+
+Initialisation:
+	'load' filePath=STRING
+;
+
+Operation:
+	(Insert | Modify | Sum | Remove | Mult | Select)
+;
+
+Insert:
+	'insertPair' path=Path jsonObject=JsonObject 
+;
+
+//terminal GOBACK : '?';
+
+//terminal ROOT : '$';
+
+Path:
+	(values+='?' | values+='$' | values+=ID)
+	('.' values+=('?' |ID ) )*
+;
+
+Modify:
+	'modify' (path=Path)? jsonObject=JsonObject
+;
+
+//Logique -> On somme les deux paramètrex3Testes mais on stocke à l'emplacement du premier
+Sum:
+	'sum' pathTOStore=Path pathToAdd=Path
+;
+
+//Logique -> Si pas de Path alors on supprime à partir du Path courant
+Remove:
+	{Remove} 'remove' (path=Path)?
+;
+
+//Logique -> On multiplie les deux paramètres mais on stocke à l'emplacement du premier
+Mult:
+	'mult' pathTOStore=Path pathToMult=Path
+;
+
+Select:
+	'select' path=Path
+;
+
+Final:
+	(Print | Store)
+;
+
+Store:
+	'store' (path=Path)? filePath=STRING
+;
+
+Print:
+	{Print} 'print' (path=Path)?
+;
+
+JsonObject:
+	(JsonEntries | JsonPrimitive)
+;
+
+JsonPrimitive:
+	(StringObject | BooleanObject | {JsonPrimitive} NULL | ArrayObject | {JsonPrimitive} NumberObject)
+;
+
+NumberObject:
+	(INT | DOUBLE)
+;
+
+terminal DOUBLE:
+	INT '.' INT
+;
+
+ArrayObject:
+	{ArrayObject} '['
+	(values+=JsonObject
+	(',' values+=JsonObject)*)?
+	']'
+;
+
+terminal NULL:
+	'null'
+;
+
+BooleanObject:
+	value=Boolean
+;
+
+enum Boolean:
+	TRUE='true' | FALSE='false'
+;
+
+StringObject:
+	value=STRING
+;
+
+JsonEntries:
+	'{' 
+	listEntries+=JsonEntry
+	(',' listEntries+=JsonEntry)*
+	'}'
+;
+
+JsonEntry:
+	'\"' key=ID '\"' ':' jsonObject=JsonObject
+;

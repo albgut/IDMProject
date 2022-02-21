@@ -1,0 +1,5 @@
+load "data/jsonTest.json"
+select fleur.b
+select ?
+insertPair "c" : "rose"
+print $
