@@ -23,5 +23,6 @@ ObjectMapper objectMapper = new ObjectMapper();
 objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
 String jsonFilePath = "data/jsonTest.json";
 JsonNode currentJsonObject = objectMapper.readTree(Paths.get(jsonFilePath).toFile());
-STORE}
+SELECTSELECTINSERTSystem.out.println("");
+}
 }

@@ -229,7 +229,7 @@ public class JacksonCompiler {
 	private String printAction(Final printAction) {
 		Stack<String> stackPath = pathFromCurrentToStack(printAction.getPath());
 		JsonNode newJson = changeJsonWithPath(currentJsonObject, stackPath);
-		System.out.println(newJson.toPrettyString());
+		//System.out.println(newJson.toPrettyString());
 		return "System.out.println(\"" + newJson.asText() + "\");\n";
 	}
 	

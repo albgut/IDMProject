@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><testrun name="Rerun ex8Test()" project="org.xtext.idmProject.tests" tests="1" started="1" failures="0" errors="0" ignored="0">
+  <testsuite name="org.xtext.idmProject.tests.IDMProjectParsingTest" time="0.63" displayname="IDMProjectParsingTest" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]">
+    <testcase name="ex8Test" classname="org.xtext.idmProject.tests.IDMProjectParsingTest" time="0.63" displayname="ex8Test()" uniqueid="[engine:junit-jupiter]/[class:org.xtext.idmProject.tests.IDMProjectParsingTest]/[method:ex8Test()]"/>
+  </testsuite>
+</testrun>
