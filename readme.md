@@ -25,12 +25,3 @@ IDMProject\img\model_print.png
 
 Le détail des tests se trouve ici : IDMProject\org.xtext.idmProject.tests\progs
 Il y a 8 fichiers qui contiennent les commandes de chaque test. Chaque fichier à pour but de tester une opération particulière : load, print, store, insert, select etc.
-
-
-
-
-
-
-
-
-
